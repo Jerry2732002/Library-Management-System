@@ -2,7 +2,6 @@ package com.example.Library_Management_System.repository;
 
 import com.example.Library_Management_System.dto.Book;
 import com.example.Library_Management_System.dto.rowmapper.BookRowMapper;
-import com.example.Library_Management_System.exception.book.BookOutOfStock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -60,7 +59,7 @@ public class BookRepository {
     public ResponseEntity<Map<String, String>> updateBookCount(String title, int newAvailableCopies) {
         String sql = "UPDATE Books SET CopiesAvailable = ?";
         if (newAvailableCopies < 0) {
-            throw new BookOutOfStock("Book: " + title + "out of stock");
+            throw new RuntimeException("Book: " + title + "out of stock");
         }
         int rowsAffected = jdbcTemplate.update(sql, newAvailableCopies);
         Map<String, String> response = new HashMap<>();

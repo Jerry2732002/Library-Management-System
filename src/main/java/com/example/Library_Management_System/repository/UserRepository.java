@@ -1,6 +1,8 @@
 package com.example.Library_Management_System.repository;
 
+import com.example.Library_Management_System.dto.BorrowDetails;
 import com.example.Library_Management_System.dto.User;
+import com.example.Library_Management_System.dto.rowmapper.BorrowDetailsRowMapper;
 import com.example.Library_Management_System.dto.rowmapper.UserRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -62,7 +64,7 @@ public class UserRepository {
     }
 
     public ResponseEntity<List<User>> getAllUsers() {
-        String sql = "SELECT * Users WHERE UserID = ?";
+        String sql = "SELECT * Users";
 
         try {
             List<User> users = jdbcTemplate.query(sql, new UserRowMapper());
@@ -72,4 +74,20 @@ public class UserRepository {
             return null;
         }
     }
+
+    public ResponseEntity<List<BorrowDetails>> getBooksBorrowedByEmail(String email) {
+        String sql = "SELECT * FROM Users u\n" +
+                "JOIN Borrows br ON br.UserID = u.UserID\n" +
+                "JOIN Books b ON b.BookID = br.BookID\n" +
+                "WHERE u.Email = ?;";
+
+        try {
+            List<BorrowDetails> borrows = jdbcTemplate.query(sql, new BorrowDetailsRowMapper());
+            Map<String, String> response = new HashMap<>();
+            return new ResponseEntity<>(borrows, HttpStatus.OK);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
 }
