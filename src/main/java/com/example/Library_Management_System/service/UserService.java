@@ -68,7 +68,11 @@ public class UserService {
         }
         if (authenticateService.checkPassword(user.getPassword(), original.getPassword())) {
             int userID = userRepository.findUserByEmail(user.getEmail()).getUserID();
-            sessionRepository.addSession(userID, session.getId());
+            if(!sessionRepository.checkUserExist(userID)){
+                sessionRepository.addSession(userID, session.getId());
+            } else {
+                sessionRepository.updateSession(userID, session.getId());
+            }
 
             Map<String, String> response = new HashMap<>();
             response.put("message", "Login Successful");

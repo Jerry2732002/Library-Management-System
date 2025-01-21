@@ -51,7 +51,7 @@ public class UserController {
             session.invalidate();
         }
         session = request.getSession(true);
-        System.out.println(session);
+
         return userService.userLogin(user, session);
     }
 
