@@ -1,7 +1,9 @@
 package com.example.Library_Management_System.repository;
 
+import com.example.Library_Management_System.dto.Admin;
 import com.example.Library_Management_System.dto.BorrowDetails;
 import com.example.Library_Management_System.dto.User;
+import com.example.Library_Management_System.dto.rowmapper.AdminRowMapper;
 import com.example.Library_Management_System.dto.rowmapper.BorrowDetailsRowMapper;
 import com.example.Library_Management_System.dto.rowmapper.UserRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +65,26 @@ public class UserRepository {
         }
     }
 
+    public User findUserByID(int userID) {
+        String sql = "SELECT * FROM Users WHERE UserID = ?";
+
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{userID}, new UserRowMapper());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    public Admin findAdminByEmail(String email) {
+        String sql = "SELECT * FROM Users WHERE Email = ?";
+
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{email}, new AdminRowMapper());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
     public ResponseEntity<List<User>> getAllUsers() {
         String sql = "SELECT * Users";
 
@@ -75,16 +97,17 @@ public class UserRepository {
         }
     }
 
-    public ResponseEntity<List<BorrowDetails>> getBooksBorrowedByEmail(String email) {
+    public ResponseEntity<Map<String, List<BorrowDetails>>> getBooksBorrowedByEmail(int userID) {
         String sql = "SELECT * FROM Users u\n" +
                 "JOIN Borrows br ON br.UserID = u.UserID\n" +
                 "JOIN Books b ON b.BookID = br.BookID\n" +
-                "WHERE u.Email = ?;";
+                "WHERE u.UserID = ?;";
 
         try {
-            List<BorrowDetails> borrows = jdbcTemplate.query(sql, new BorrowDetailsRowMapper());
-            Map<String, String> response = new HashMap<>();
-            return new ResponseEntity<>(borrows, HttpStatus.OK);
+            List<BorrowDetails> borrows = jdbcTemplate.query(sql, new BorrowDetailsRowMapper(),userID);
+            Map<String, List<BorrowDetails>> response = new HashMap<>();
+            response.put("Result", borrows);
+            return new ResponseEntity<>(response , HttpStatus.OK);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }

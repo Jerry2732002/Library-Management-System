@@ -21,7 +21,7 @@ public class BorrowRepository {
     }
 
     public Borrow getBorrow(int userID, int bookID) {
-        String sql = "SELECT * FROM Borrows WHERE BookID = ? AND UserID = ? LIMIT 1";
+        String sql = "SELECT * FROM Borrows WHERE BookID = ? AND UserID = ? AND ReturnDate IS NULL LIMIT 1";
         try {
             return jdbcTemplate.queryForObject(sql, new Object[]{bookID,userID}, new BorrowRowMapper());
         } catch (EmptyResultDataAccessException e) {
@@ -29,10 +29,10 @@ public class BorrowRepository {
         }
     }
 
-    public boolean updateFine(int userID, int bookID, int fine) {
-        String sql = "UPDATE Borrows SET Fine = ? WHERE UserID = ? AND BookID = ?";
-        int rowsAffected = jdbcTemplate.update(sql, fine, userID, bookID);
-        return rowsAffected == 1;
+    public boolean updateFine(int borrowID, int fine) {
+        String sql = "UPDATE Borrows SET Fine = ? WHERE BorrowID = ?";
+        int rowsAffected = jdbcTemplate.update(sql, fine, borrowID);
+        return rowsAffected > 0;
     }
 
     public boolean borrowBook(Borrow borrow) {
@@ -42,9 +42,18 @@ public class BorrowRepository {
     }
 
     public boolean returnBook(Borrow borrow) {
-        String sql = "UPDATE Borrows SET ReturnDate = ? WHERE UserID = ? AND BookID = ?";
-        int rowsAffected = jdbcTemplate.update(sql, borrow.getReturnDate(), borrow.getUserID(), borrow.getBookID());
-        return rowsAffected == 1;
+        String sql = "UPDATE Borrows SET ReturnDate = ? WHERE BorrowID = ?";
+        int rowsAffected = jdbcTemplate.update(sql, borrow.getReturnDate(), borrow.getBorrowID());
+        return rowsAffected > 0;
     }
 
+
+    public boolean checkIfBookReturned(int borrowID) {
+        String sql = "SELECT * FROM Borrows WHERE BorrowID = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{borrowID}, new BorrowRowMapper()).getReturnDate() == null;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
+    }
 }

@@ -42,9 +42,9 @@ public class BookRepository {
     }
 
     public ResponseEntity<Map<String, String>> updateBook(String title, Book book) {
-        String sql = "UPDATE Books SET Title = ?, Author = ?, Category = ?, Rare = ?, CopiesAvailable = ?";
+        String sql = "UPDATE Books SET Title = ?, Author = ?, Category = ?, Rare = ?, CopiesAvailable = ? WHERE Title = ?";
 
-        int rowsAffected = jdbcTemplate.update(sql, book.getTitle(), book.getAuthor(), book.getCategory().name(), book.isRare(), book.getCopiesAvailable());
+        int rowsAffected = jdbcTemplate.update(sql, book.getTitle(), book.getAuthor(), book.getCategory().name(), book.isRare(), book.getCopiesAvailable(), title);
         Map<String, String> response = new HashMap<>();
 
         if (rowsAffected == 1) {
@@ -57,14 +57,14 @@ public class BookRepository {
     }
 
     public ResponseEntity<Map<String, String>> updateBookCount(String title, int newAvailableCopies) {
-        String sql = "UPDATE Books SET CopiesAvailable = ?";
+        String sql = "UPDATE Books SET CopiesAvailable = ? WHERE Title = ?";
         if (newAvailableCopies < 0) {
-            throw new RuntimeException("Book: " + title + "out of stock");
+            throw new RuntimeException("Book: " + title + " out of stock");
         }
-        int rowsAffected = jdbcTemplate.update(sql, newAvailableCopies);
+        int rowsAffected = jdbcTemplate.update(sql, newAvailableCopies, title);
         Map<String, String> response = new HashMap<>();
 
-        if (rowsAffected == 1) {
+        if (rowsAffected > 0) {
             response.put("message", "Available Copies Updated Successfully");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
@@ -97,7 +97,7 @@ public class BookRepository {
     public ResponseEntity<Map<String, String>> removeBook(String title) {
         String sql = "DELETE FROM Books WHERE Title = ?";
 
-        int rowsAffected = jdbcTemplate.update(sql);
+        int rowsAffected = jdbcTemplate.update(sql, title);
         Map<String, String> response = new HashMap<>();
 
         if (rowsAffected == 1) {
