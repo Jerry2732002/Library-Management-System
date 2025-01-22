@@ -9,6 +9,7 @@ import com.example.Library_Management_System.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
+
 
 @RestController
 @RequestMapping("user")
@@ -32,7 +34,8 @@ public class UserController {
         this.sessionRepository = sessionRepository;
     }
 
-    private int isSessionValid(HttpSession session) {
+    private int isSessionValid(HttpRequest request) {
+        Set keys = request.getAttributes().keySet();
         String sessionId = session.getId();
 
         return sessionRepository.getUserID(sessionId);
@@ -57,6 +60,7 @@ public class UserController {
 
     @GetMapping(path = "/borrow-history", produces = "application/json")
     public ResponseEntity<Map<String, List<BorrowDetails>>> getBooksBorrowedByEmail(HttpSession session) {
+
         int userID = isSessionValid(session);
         if (userID == -1) {
             Map<String, List<BorrowDetails>> response = new HashMap<>();

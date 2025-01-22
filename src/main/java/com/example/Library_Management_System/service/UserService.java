@@ -70,6 +70,7 @@ public class UserService {
             int userID = userRepository.findUserByEmail(user.getEmail()).getUserID();
             if(!sessionRepository.checkUserExist(userID)){
                 sessionRepository.addSession(userID, session.getId());
+                session.invalidate();
             } else {
                 sessionRepository.updateSession(userID, session.getId());
             }
