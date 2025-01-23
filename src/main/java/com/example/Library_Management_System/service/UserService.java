@@ -70,7 +70,6 @@ public class UserService {
             int userID = userRepository.findUserByEmail(user.getEmail()).getUserID();
             if(!sessionRepository.checkUserExist(userID)){
                 sessionRepository.addSession(userID, session.getId());
-                session.invalidate();
             } else {
                 sessionRepository.updateSession(userID, session.getId());
             }
@@ -208,7 +207,7 @@ public class UserService {
         return bookRepository.getAllBooks();
     }
 
-    public ResponseEntity<Map<String, String>> adminLogin(User admin) {
+    public ResponseEntity<Map<String, String>> adminLogin(User admin, HttpSession session) {
         Admin original = userRepository.findAdminByEmail(admin.getEmail());
 
         if (original == null) {
@@ -220,10 +219,19 @@ public class UserService {
         }
         if (authenticateService.checkPassword(admin.getPassword(), original.getPassword())) {
 
+            int userID = userRepository.findUserByEmail(admin.getEmail()).getUserID();
+            if(!sessionRepository.checkUserExist(userID)){
+                sessionRepository.addSession(userID, session.getId());
+            } else {
+                sessionRepository.updateSession(userID, session.getId());
+            }
+
             Map<String, String> response = new HashMap<>();
             response.put("message", "Login Successful");
+            response.put("SessionID", session.getId());
 
             return new ResponseEntity<>(response, HttpStatus.OK);
+
         } else {
 
             Map<String, String> response = new HashMap<>();
