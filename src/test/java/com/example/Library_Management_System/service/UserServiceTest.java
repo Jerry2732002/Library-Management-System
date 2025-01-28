@@ -46,37 +46,37 @@ class UserServiceTest {
     void testUserLogin_Success() {
 
         User user = new User();
-        user.setEmail("test@example.com");
+        user.setEmail("jerry@gmail.com");
         user.setPassword("password123");
 
         User storedUser = new User();
         storedUser.setUserID(1);
-        storedUser.setEmail("test@example.com");
+        storedUser.setEmail("jerry@gmail.com");
         storedUser.setPassword("encoded_password");
 
-        when(userRepository.findUserByEmail("test@example.com")).thenReturn(storedUser);
+        when(userRepository.findUserByEmail("jerry@gmail.com")).thenReturn(storedUser);
         when(authenticateService.checkPassword("password123", "encoded_password")).thenReturn(true);
         when(sessionRepository.checkUserExist(1)).thenReturn(false);
-        when(sessionRepository.addSession(1, "mockedSessionId")).thenReturn(true);
-        when(httpSession.getId()).thenReturn("mockedSessionId");
+        when(sessionRepository.addSession(1, "somesessionid")).thenReturn(true);
+        when(httpSession.getId()).thenReturn("somesessionid");
 
         ResponseEntity<Map<String, String>> response = userService.userLogin(user, httpSession);
 
-        verify(userRepository).findUserByEmail("test@example.com");
+        verify(userRepository).findUserByEmail("jerry@gmail.com");
         verify(authenticateService).checkPassword("password123", "encoded_password");
-        verify(sessionRepository).addSession(1, "mockedSessionId");
+        verify(sessionRepository).addSession(1, "somesessionid");
 
         assertEquals(200, response.getStatusCodeValue());  // HTTP Status OK
         assertEquals("Login Successful", response.getBody().get("message"));
-        assertEquals("mockedSessionId", response.getBody().get("SessionID"));
+        assertEquals("somesessionid", response.getBody().get("SessionID"));
     }
 
     @Test
     void testUserLogin_InvalidEmail() {
         User user = new User();
-        user.setEmail("invalid@example.com");
+        user.setEmail("jerrrry@gmail.com");
 
-        when(userRepository.findUserByEmail("invalid@example.com")).thenReturn(null);
+        when(userRepository.findUserByEmail("jerrrry@gmail.com")).thenReturn(null);
         ResponseEntity<Map<String, String>> response = userService.userLogin(user, httpSession);
 
 
@@ -88,19 +88,19 @@ class UserServiceTest {
     void testUserLogin_IncorrectPassword() {
 
         User user = new User();
-        user.setEmail("test@example.com");
-        user.setPassword("wrongPassword");
+        user.setEmail("jerry@gmail.com");
+        user.setPassword("hsdfhsfdhsdhf");
 
         User storedUser = new User();
-        storedUser.setEmail("test@example.com");
+        storedUser.setEmail("jerry@gmail.com");
         storedUser.setPassword("encoded_password");
 
-        when(userRepository.findUserByEmail("test@example.com")).thenReturn(storedUser);
-        when(authenticateService.checkPassword("wrongPassword", "encoded_password")).thenReturn(false);
+        when(userRepository.findUserByEmail("jerry@gmail.com")).thenReturn(storedUser);
+        when(authenticateService.checkPassword("hsdfhsfdhsdhf", "encoded_password")).thenReturn(false);
 
         ResponseEntity<Map<String, String>> response = userService.userLogin(user, httpSession);
 
-        assertEquals(400, response.getStatusCodeValue());  // HTTP Status Bad Request
+        assertEquals(400, response.getStatusCodeValue());
         assertEquals("Incorrect password", response.getBody().get("message"));
     }
 }

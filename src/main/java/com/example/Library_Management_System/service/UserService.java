@@ -2,6 +2,8 @@ package com.example.Library_Management_System.service;
 
 import com.example.Library_Management_System.dto.*;
 import com.example.Library_Management_System.enums.Category;
+import com.example.Library_Management_System.exception.IncorrectPasswordException;
+import com.example.Library_Management_System.exception.UserNotFoundException;
 import com.example.Library_Management_System.repository.BookRepository;
 import com.example.Library_Management_System.repository.BorrowRepository;
 import com.example.Library_Management_System.repository.SessionRepository;
@@ -62,9 +64,7 @@ public class UserService {
         if (original == null) {
 
             Map<String, String> response = new HashMap<>();
-            response.put("message", "Invalid Email(Email not found)");
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            throw new UserNotFoundException("Invalid Email(Email not found)");
         }
         if (authenticateService.checkPassword(user.getPassword(), original.getPassword())) {
             int userID = userRepository.findUserByEmail(user.getEmail()).getUserID();
@@ -80,11 +80,7 @@ public class UserService {
 
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Incorrect password");
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            throw new IncorrectPasswordException("Incorrect password");
         }
     }
 
