@@ -90,7 +90,7 @@ public class BookRepository {
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
         } else {
-            return updateBookCount(book.getTitle(), existingBook.getCopiesAvailable() + 1);
+            return updateBookCount(book.getTitle(), existingBook.getCopiesAvailable() + book.getCopiesAvailable());
         }
     }
 

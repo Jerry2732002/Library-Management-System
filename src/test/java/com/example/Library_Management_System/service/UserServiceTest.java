@@ -1,6 +1,10 @@
 package com.example.Library_Management_System.service;
 
+import com.example.Library_Management_System.dto.Book;
+import com.example.Library_Management_System.dto.Borrow;
 import com.example.Library_Management_System.dto.User;
+import com.example.Library_Management_System.exception.IncorrectPasswordException;
+import com.example.Library_Management_System.exception.UserNotFoundException;
 import com.example.Library_Management_System.repository.UserRepository;
 import com.example.Library_Management_System.repository.SessionRepository;
 import com.example.Library_Management_System.repository.BookRepository;
@@ -18,7 +22,7 @@ import java.util.Map;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)  // Automatically initialize mocks
+@ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
     @Mock
@@ -66,7 +70,7 @@ class UserServiceTest {
         verify(authenticateService).checkPassword("password123", "encoded_password");
         verify(sessionRepository).addSession(1, "somesessionid");
 
-        assertEquals(200, response.getStatusCodeValue());  // HTTP Status OK
+        assertEquals(200, response.getStatusCodeValue());
         assertEquals("Login Successful", response.getBody().get("message"));
         assertEquals("somesessionid", response.getBody().get("SessionID"));
     }
@@ -77,11 +81,10 @@ class UserServiceTest {
         user.setEmail("jerrrry@gmail.com");
 
         when(userRepository.findUserByEmail("jerrrry@gmail.com")).thenReturn(null);
-        ResponseEntity<Map<String, String>> response = userService.userLogin(user, httpSession);
+        Exception exception = assertThrows(UserNotFoundException.class, () -> userService.userLogin(user, httpSession));
+        String actualMessage = "Invalid Email";
+        assertEquals(actualMessage, exception.getMessage());
 
-
-        assertEquals(400, response.getStatusCodeValue());  // HTTP Status Bad Request
-        assertEquals("Invalid Email(Email not found)", response.getBody().get("message"));
     }
 
     @Test
@@ -98,9 +101,67 @@ class UserServiceTest {
         when(userRepository.findUserByEmail("jerry@gmail.com")).thenReturn(storedUser);
         when(authenticateService.checkPassword("hsdfhsfdhsdhf", "encoded_password")).thenReturn(false);
 
-        ResponseEntity<Map<String, String>> response = userService.userLogin(user, httpSession);
+        Exception exception = assertThrows(IncorrectPasswordException.class, () -> userService.userLogin(user, httpSession));
 
-        assertEquals(400, response.getStatusCodeValue());
-        assertEquals("Incorrect password", response.getBody().get("message"));
+        String actualMessage = "Incorrect password";
+        assertEquals(actualMessage, exception.getMessage());
     }
+
+    @Test
+    void borrowBookTest_Success() {
+        User user = new User();
+        user.setUserID(1);
+        user.setEmail("jerry@gmail.com");
+
+        Book book = new Book();
+        book.setBookID(1);
+        book.setTitle("The Great Gatsby");
+        book.setCopiesAvailable(5);
+
+        when(userRepository.findUserByID(1)).thenReturn(user);
+        when(bookRepository.getBookByTitle("The Great Gatsby")).thenReturn(book);
+        when(borrowRepository.borrowBook(any(Borrow.class))).thenReturn(true);
+
+        ResponseEntity<Map<String, String>> response = userService.borrowBook(1, "The Great Gatsby");
+
+        verify(userRepository).findUserByID(1);
+        verify(bookRepository).getBookByTitle("The Great Gatsby");
+        verify(borrowRepository).borrowBook(any(Borrow.class));
+        verify(bookRepository).updateBookCount("The Great Gatsby", 4);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Borrow Successful", response.getBody().get("message"));
+    }
+
+    @Test
+    void borrowBookTest_BookNotFound() {
+        User user = new User();
+        user.setUserID(1);
+
+        when(bookRepository.getBookByTitle("Nonexistent Book")).thenThrow(new RuntimeException("Book Not Found"));
+
+        Exception exception = assertThrows(RuntimeException.class, () -> bookRepository.getBookByTitle("Nonexistent Book"));
+
+        String actualMessage = "Book Not Found";
+
+        assertEquals(actualMessage, exception.getMessage());
+    }
+
+    @Test
+    void borrowBookTest_UserNotFound() {
+        Book book = new Book();
+        book.setBookID(1);
+        book.setTitle("The Great Gatsby");
+
+
+        when(bookRepository.getBookByTitle("The Great Gatsby")).thenReturn(book);
+
+        Exception exception = assertThrows(RuntimeException.class, () -> userService.borrowBook(12, "The Great Gatsby"));
+
+        String actualMessage = "User Not Found";
+
+        assertEquals(actualMessage, exception.getMessage());
+    }
+
+
 }

@@ -63,11 +63,10 @@ public class UserService {
 
         if (original == null) {
 
-            Map<String, String> response = new HashMap<>();
-            throw new UserNotFoundException("Invalid Email(Email not found)");
+            throw new UserNotFoundException("Invalid Email");
         }
         if (authenticateService.checkPassword(user.getPassword(), original.getPassword())) {
-            int userID = userRepository.findUserByEmail(user.getEmail()).getUserID();
+            int userID =original.getUserID();
             if(!sessionRepository.checkUserExist(userID)){
                 sessionRepository.addSession(userID, session.getId());
             } else {

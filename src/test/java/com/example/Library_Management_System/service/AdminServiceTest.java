@@ -16,7 +16,7 @@ import java.util.Map;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)  // Ensures Mockito is enabled
+@ExtendWith(MockitoExtension.class)
 class AdminServiceTest {
 
     @Mock
@@ -39,7 +39,7 @@ class AdminServiceTest {
         when(bookRepository.updateBook("Test Book", book)).thenReturn(ResponseEntity.ok(Map.of("message", "Book updated successfully")));
         ResponseEntity<Map<String, String>> response = adminService.updateBook("Test Book", book);
         verify(bookRepository).updateBook("Test Book", book);
-        assertEquals(200, response.getStatusCodeValue());  // HTTP Status OK
+        assertEquals(200, response.getStatusCodeValue());
         assertEquals("Book updated successfully", response.getBody().get("message"));
     }
 
@@ -49,7 +49,7 @@ class AdminServiceTest {
         ResponseEntity<Map<String, String>> response = adminService.updateBookCount("Test Book", 5);
         verify(bookRepository).updateBookCount("Test Book", 5);
 
-        assertEquals(200, response.getStatusCodeValue());  // HTTP Status OK
+        assertEquals(200, response.getStatusCodeValue());
         assertEquals("Book count updated successfully", response.getBody().get("message"));
     }
 
@@ -63,7 +63,7 @@ class AdminServiceTest {
         ResponseEntity<Map<String, String>> response = adminService.addBook(book);
 
         verify(bookRepository).addBook(book);
-        assertEquals(200, response.getStatusCodeValue());  // HTTP Status OK
+        assertEquals(200, response.getStatusCodeValue());
         assertEquals("Book added successfully", response.getBody().get("message"));
     }
 
@@ -72,7 +72,7 @@ class AdminServiceTest {
         when(bookRepository.removeBook("Test Book")).thenReturn(ResponseEntity.ok(Map.of("message", "Book removed successfully")));
         ResponseEntity<Map<String, String>> response = adminService.removeBook("Test Book");
         verify(bookRepository).removeBook("Test Book");
-        assertEquals(200, response.getStatusCodeValue());  // HTTP Status OK
+        assertEquals(200, response.getStatusCodeValue());
         assertEquals("Book removed successfully", response.getBody().get("message"));
     }
 
@@ -84,7 +84,7 @@ class AdminServiceTest {
         when(userService.adminLogin(admin, httpSession)).thenReturn(ResponseEntity.ok(Map.of("message", "Login Successful")));
         ResponseEntity<Map<String, String>> response = adminService.adminLogin(admin, httpSession);
         verify(userService).adminLogin(admin, httpSession);
-        assertEquals(200, response.getStatusCodeValue());  // HTTP Status OK
+        assertEquals(200, response.getStatusCodeValue());
         assertEquals("Login Successful", response.getBody().get("message"));
     }
 
@@ -103,8 +103,8 @@ class AdminServiceTest {
 
         verify(bookRepository).getAllBooks();
 
-        assertEquals(2, books.size());  // Should return two books
-        assertEquals("Book 1", books.get(0).getTitle());  // Verify book title
-        assertEquals("Book 2", books.get(1).getTitle());  // Verify book title
+        assertEquals(2, books.size());
+        assertEquals("Book 1", books.get(0).getTitle());
+        assertEquals("Book 2", books.get(1).getTitle());
     }
 }
