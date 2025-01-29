@@ -1,11 +1,19 @@
 package com.example.Library_Management_System.repository;
 
 import com.example.Library_Management_System.dto.Borrow;
+import com.example.Library_Management_System.dto.BorrowDetails;
+import com.example.Library_Management_System.dto.rowmapper.BorrowDetailsRowMapper;
 import com.example.Library_Management_System.dto.rowmapper.BorrowRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Repository
@@ -52,6 +60,21 @@ public class BorrowRepository {
             return jdbcTemplate.queryForObject(sql, new Object[]{borrowID}, new BorrowRowMapper()).getReturnDate() == null;
         } catch (EmptyResultDataAccessException e) {
             return false;
+        }
+    }
+
+    public ResponseEntity<Map<String, List<BorrowDetails>>> getAllBorrowDetails() {
+        String sql = "SELECT * FROM Users u\n" +
+                "JOIN Borrows br ON br.UserID = u.UserID\n" +
+                "JOIN Books b ON b.BookID = br.BookID;";
+
+        try {
+            List<BorrowDetails> borrows = jdbcTemplate.query(sql, new BorrowDetailsRowMapper());
+            Map<String, List<BorrowDetails>> response = new HashMap<>();
+            response.put("Result", borrows);
+            return new ResponseEntity<>(response , HttpStatus.OK);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
     }
 }

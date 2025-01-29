@@ -9,6 +9,6 @@ import java.sql.SQLException;
 public class AdminRowMapper implements RowMapper<Admin> {
     @Override
     public Admin mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new Admin(rs.getString("Email"), rs.getString("Password"));
+        return new Admin(rs.getInt("UserID"),rs.getString("Email"), rs.getString("Password"));
     }
 }

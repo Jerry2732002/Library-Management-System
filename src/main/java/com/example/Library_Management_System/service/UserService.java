@@ -214,7 +214,7 @@ public class UserService {
 
         if (authenticateService.checkPassword(admin.getPassword(), original.getPassword())) {
 
-            int userID = userRepository.findUserByEmail(admin.getEmail()).getUserID();
+            int userID = userRepository.findAdminByEmail(admin.getEmail()).getAdminID();
             if(!sessionRepository.checkUserExist(userID)){
                 sessionRepository.addSession(userID, session.getId());
             } else {

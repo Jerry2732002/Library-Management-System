@@ -1,9 +1,11 @@
 package com.example.Library_Management_System.controller;
 
 import com.example.Library_Management_System.dto.Book;
+import com.example.Library_Management_System.dto.BorrowDetails;
 import com.example.Library_Management_System.dto.User;
 import com.example.Library_Management_System.repository.SessionRepository;
 import com.example.Library_Management_System.service.AdminService;
+import com.example.Library_Management_System.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,7 @@ public class AdminController {
     private final SessionRepository sessionRepository;
 
     @Autowired
-    public AdminController(AdminService adminService, SessionRepository sessionRepository) {
+    public AdminController(AdminService adminService, SessionRepository sessionRepository, UserService userService) {
         this.adminService = adminService;
         this.sessionRepository = sessionRepository;
     }
@@ -89,5 +91,8 @@ public class AdminController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
+    @GetMapping(path = "borrow/get-all-borrows", produces = "application/json")
+    public ResponseEntity<Map<String, List<BorrowDetails>>> getAllBorrowDetails() {
+        return adminService.getAllBorrowDetails();
+    }
 }

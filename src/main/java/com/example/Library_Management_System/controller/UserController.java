@@ -65,7 +65,7 @@ public class UserController {
             return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
 
-        return userService.getBooksBorrowedByEmail(1);
+        return userService.getBooksBorrowedByEmail(userID);
     }
 
     @PostMapping(path = "book/borrow")
@@ -92,7 +92,7 @@ public class UserController {
         return userService.returnBook(userID, title);
     }
 
-    @GetMapping(path = "/list", produces = "application/json")
+    @GetMapping(path = "book/list", produces = "application/json")
     public ResponseEntity<Map<String, List<Book>>> getAllBooks(@CookieValue(value = "JSESSION", defaultValue = "12345")String sessionID) {
         int userID = isSessionValid(sessionID);
         if (userID == -1) {

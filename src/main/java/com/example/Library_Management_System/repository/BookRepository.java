@@ -44,7 +44,7 @@ public class BookRepository {
     public ResponseEntity<Map<String, String>> updateBook(String title, Book book) {
         String sql = "UPDATE Books SET Title = ?, Author = ?, Category = ?, Rare = ?, CopiesAvailable = ? WHERE Title = ?";
 
-        int rowsAffected = jdbcTemplate.update(sql, book.getTitle(), book.getAuthor(), book.getCategory().name(), book.isRare(), book.getCopiesAvailable(), title);
+        int rowsAffected = jdbcTemplate.update(sql, title, book.getAuthor(), book.getCategory().name(), book.isRare(), book.getCopiesAvailable(), title);
         Map<String, String> response = new HashMap<>();
 
         if (rowsAffected == 1) {
