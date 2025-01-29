@@ -1,0 +1,405 @@
+{
+	"info": {
+		"_postman_id": "3e578c92-8478-4db9-a3cb-c33f6b78e99e",
+		"name": "LibraryManagementSystem",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28268980"
+	},
+	"item": [
+		{
+			"name": "RegisterUser",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"sam.doe@example.com\",\r\n  \"password\": \"securepassword123\",\r\n  \"firstName\": \"Sam\",\r\n  \"lastName\": \"Doe\",\r\n  \"membership\":\"GOLD\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/user/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"john.doe@example.com\",\r\n    \"password\": \"securepassword123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/user/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BorrowBook",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "JSESSION=AC36DD2115DCC992AC0DE8C8B08D919B",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/user/book/borrow?title=The Galactic Journey",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"book",
+						"borrow"
+					],
+					"query": [
+						{
+							"key": "title",
+							"value": "The Galactic Journey"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ListBorrowedBook",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "JSESSION=AC36DD2115DCC992AC0DE8C8B08D919B",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/user/borrow-history",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"borrow-history"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ReturnBook",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "JSESSION=AC36DD2115DCC992AC0DE8C8B08D919B",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/user/book/return?title=The Galactic Journey",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"book",
+						"return"
+					],
+					"query": [
+						{
+							"key": "title",
+							"value": "The Galactic Journey"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List All Books",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "JSESSION=AC36DD2115DCC992AC0DE8C8B08D919B",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/user/book/list",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"book",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List By Category",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "JSESSION=AC36DD2115DCC992AC0DE8C8B08D919B",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/user/book/category/SCIENCE_FICTION",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"book",
+						"category",
+						"SCIENCE_FICTION"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Book By Author",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "JSESSION=AC36DD2115DCC992AC0DE8C8B08D919B",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/user/book/author/Jane Smith",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"book",
+						"author",
+						"Jane Smith"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"admin@gmail.com\",\r\n    \"password\":\"admin123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/admin/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Adding a book",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "JSESSION=764C9BE0394388CE23875C4A47A7CA16",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"bookID\": 123,\r\n  \"title\": \"The Great Earth Adventure\",\r\n  \"author\": \"John Doe\",\r\n  \"category\": \"FANTASY\",\r\n  \"rare\": true,\r\n  \"copiesAvailable\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/book/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"book",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remove a book",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "JSESSION=764C9BE0394388CE23875C4A47A7CA16",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/book/remove/The Great Adventure",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"book",
+						"remove",
+						"The Great Adventure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Borrow Details",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "JSESSION=764C9BE0394388CE23875C4A47A7CA16",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/borrow/get-all-borrows",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"borrow",
+						"get-all-borrows"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Book",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "JSESSION=764C9BE0394388CE23875C4A47A7CA16",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"author\": \"John D Doe\",\r\n  \"rare\": false,\r\n  \"copiesAvailable\": 7\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/book/update/The Great Earth Adventure",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"book",
+						"update",
+						"The Great Earth Adventure"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
