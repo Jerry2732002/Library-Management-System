@@ -209,9 +209,9 @@ public class UserService {
 
             Map<String, String> response = new HashMap<>();
             response.put("message", "Invalid Email(Email not found)");
-
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
+
         if (authenticateService.checkPassword(admin.getPassword(), original.getPassword())) {
 
             int userID = userRepository.findUserByEmail(admin.getEmail()).getUserID();

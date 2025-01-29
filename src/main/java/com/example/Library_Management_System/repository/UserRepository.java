@@ -47,10 +47,10 @@ public class UserRepository {
         int rowsAffected = jdbcTemplate.update(sql, userID);
         Map<String, String> response = new HashMap<>();
         if (rowsAffected == 1) {
-            response.put("message", "User Added Successfully");
+            response.put("message", "User Deleted Successfully");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            response.put("message", "Failed To Add User");
+            response.put("message", "Failed To Delete User");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
@@ -90,7 +90,6 @@ public class UserRepository {
 
         try {
             List<User> users = jdbcTemplate.query(sql, new UserRowMapper());
-            Map<String, String> response = new HashMap<>();
             return new ResponseEntity<>(users, HttpStatus.OK);
         } catch (EmptyResultDataAccessException e) {
             return null;
@@ -112,4 +111,6 @@ public class UserRepository {
             return null;
         }
     }
+
+
 }

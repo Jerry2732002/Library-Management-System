@@ -1,9 +1,7 @@
 package com.example.Library_Management_System.repository;
 
-import com.example.Library_Management_System.dto.Book;
 import com.example.Library_Management_System.dto.Borrow;
 import com.example.Library_Management_System.dto.rowmapper.BorrowRowMapper;
-import com.example.Library_Management_System.dto.rowmapper.UserRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -1,8 +1,11 @@
 package com.example.Library_Management_System.dto;
 
+import com.example.Library_Management_System.enums.Role;
+
 public class Admin {
     private String email;
     private String password;
+    private Role role = Role.ADMIN;
 
     public Admin(String email, String password) {
         this.email = email;
@@ -27,5 +30,13 @@ public class Admin {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }
