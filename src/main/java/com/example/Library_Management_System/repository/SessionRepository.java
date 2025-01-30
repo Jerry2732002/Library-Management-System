@@ -12,19 +12,8 @@ public class SessionRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public boolean checkUserExist(int userID) {
-        String sql = "SELECT 1 FROM Sessions WHERE UserID = ?";
-
-        try {
-            jdbcTemplate.queryForObject(sql, new Object[]{userID}, Integer.class);
-            return true;
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
-    }
-
     public boolean addSession(int userID, String sessionID) {
-        String sql = "INSERT INTO Sessions VALUES (?,?)";
+        String sql = "REPLACE INTO Sessions VALUES (?,?)";
 
         int rowsAffected = jdbcTemplate.update(sql, userID, sessionID);
 
@@ -39,14 +28,6 @@ public class SessionRepository {
         } catch (EmptyResultDataAccessException e) {
             return -1;
         }
-    }
-
-    public boolean updateSession(int userID, String sessionID) {
-        String sql = "UPDATE Sessions SET SessionID = ? WHERE UserID = ?";
-
-        int rowsAffected = jdbcTemplate.update(sql, sessionID, userID);
-
-        return rowsAffected > 0;
     }
 
 }

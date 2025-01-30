@@ -1,9 +1,15 @@
 package com.example.Library_Management_System.controller;
 
+import com.example.Library_Management_System.dto.Admin;
 import com.example.Library_Management_System.dto.Book;
 import com.example.Library_Management_System.dto.BorrowDetails;
 import com.example.Library_Management_System.dto.User;
+import com.example.Library_Management_System.enums.Membership;
+import com.example.Library_Management_System.enums.Role;
+import com.example.Library_Management_System.exception.AdminPermissionException;
+import com.example.Library_Management_System.exception.SessionExpiredException;
 import com.example.Library_Management_System.repository.SessionRepository;
+import com.example.Library_Management_System.repository.UserRepository;
 import com.example.Library_Management_System.service.AdminService;
 import com.example.Library_Management_System.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,15 +27,28 @@ import java.util.Map;
 public class AdminController {
     private final AdminService adminService;
     private final SessionRepository sessionRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public AdminController(AdminService adminService, SessionRepository sessionRepository, UserService userService) {
+    public AdminController(AdminService adminService, SessionRepository sessionRepository, UserService userService, UserRepository userRepository) {
         this.adminService = adminService;
         this.sessionRepository = sessionRepository;
+        this.userRepository = userRepository;
     }
 
-    private int isSessionValid(String sessionId) {
-        return sessionRepository.getUserID(sessionId);
+    private void checkIfAdmin(int userID) {
+        Admin admin = userRepository.findAdminByID(userID);
+        if (!admin.getRole().equals(Role.ADMIN)) {
+            throw new AdminPermissionException("User: " + admin.getEmail() + " is not a VALID ADMIN");
+        }
+    }
+
+    private void isSessionValid(String sessionId) {
+        int userID = sessionRepository.getUserID(sessionId);
+        if (userID == -1) {
+            throw new SessionExpiredException("Session Expired. Please Login Again");
+        }
+        checkIfAdmin(userID);
     }
 
     @PostMapping(path = "admin/login")
@@ -45,54 +64,46 @@ public class AdminController {
     }
 
     @PostMapping(path = "book/add")
-    public ResponseEntity<Map<String, String>> addBook(@CookieValue(value = "JSESSION", defaultValue = "12345") String sessionID, @RequestBody Book book) {
-        int userID = isSessionValid(sessionID);
-        if (userID == -1) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Invalid or expired session. Please log in again");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<Map<String, String>> addBook(@CookieValue(value = "JSESSION") String sessionID, @RequestBody Book book) {
+        isSessionValid(sessionID);
+
         return adminService.addBook(book);
     }
 
     @DeleteMapping(path = "book/remove/{title}", produces = "application/json")
-    public ResponseEntity<Map<String, String>> removeBook(@CookieValue(value = "JSESSION", defaultValue = "12345") String sessionID, @PathVariable("title") String title) {
-        int userID = isSessionValid(sessionID);
-        if (userID == -1) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Invalid or expired session. Please log in again");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<Map<String, String>> removeBook(@CookieValue(value = "JSESSION") String sessionID, @PathVariable("title") String title) {
+        isSessionValid(sessionID);
+
         return adminService.removeBook(title);
     }
 
     @PutMapping(path = "book/update/{title}", produces = "application/json")
-    public ResponseEntity<Map<String, String>> updateBook(@CookieValue(value = "JSESSION", defaultValue = "12345") String sessionID, @PathVariable("title") String title, @RequestBody Book book) {
-        int userID = isSessionValid(sessionID);
-        if (userID == -1) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Invalid or expired session. Please log in again");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<Map<String, String>> updateBook(@CookieValue(value = "JSESSION") String sessionID, @PathVariable("title") String title, @RequestBody Book book) {
+        isSessionValid(sessionID);
 
         return adminService.updateBook(title, book);
     }
 
     @GetMapping(path = "book/list", produces = "application/json")
-    public ResponseEntity<Map<String, List<Book>>>  getAllBooks(@CookieValue(value = "JSESSION", defaultValue = "12345") String sessionID) {
-        int userID = isSessionValid(sessionID);
-        if (userID == -1) {
-            Map<String, List<Book>> response = new HashMap<>();
-            response.put("message : Invalid or expired session. Please log in again", null);
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<Map<String, List<Book>>> getAllBooks(@CookieValue(value = "JSESSION") String sessionID) {
+        isSessionValid(sessionID);
+
         Map<String, List<Book>> response = new HashMap<>();
         response.put("result", adminService.getAllBooks());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping(path = "borrow/get-all-borrows", produces = "application/json")
-    public ResponseEntity<Map<String, List<BorrowDetails>>> getAllBorrowDetails() {
+    public ResponseEntity<Map<String, List<BorrowDetails>>> getAllBorrowDetails(@CookieValue(value = "JSESSION") String sessionID) {
+        isSessionValid(sessionID);
+
         return adminService.getAllBorrowDetails();
+    }
+
+    @PutMapping(path = "update-permission", produces = "application/json")
+    public ResponseEntity<Map<String, String>> updateUserMembership(@CookieValue(value = "JSESSION") String sessionID, @RequestParam("email") String email, @RequestParam("membership") Membership membership) {
+        isSessionValid(sessionID);
+
+        return adminService.updateUserMembership(email, membership);
     }
 }

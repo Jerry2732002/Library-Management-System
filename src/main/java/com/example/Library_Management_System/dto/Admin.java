@@ -8,10 +8,11 @@ public class Admin {
     private String password;
     private Role role = Role.ADMIN;
 
-    public Admin(int adminID, String email, String password) {
+    public Admin(int adminID, String email, String password, String role) {
         this.adminID = adminID;
         this.email = email;
         this.password = password;
+        this.role = Role.valueOf(role);
     }
 
     public Admin() {

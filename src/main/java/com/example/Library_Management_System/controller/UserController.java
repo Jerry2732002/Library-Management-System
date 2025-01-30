@@ -4,6 +4,7 @@ import com.example.Library_Management_System.dto.Book;
 import com.example.Library_Management_System.dto.BorrowDetails;
 import com.example.Library_Management_System.dto.User;
 import com.example.Library_Management_System.enums.Category;
+import com.example.Library_Management_System.exception.SessionExpiredException;
 import com.example.Library_Management_System.repository.SessionRepository;
 import com.example.Library_Management_System.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -36,7 +37,11 @@ public class UserController {
     }
 
     private int isSessionValid(String sessionId) {
-        return sessionRepository.getUserID(sessionId);
+        int userID = sessionRepository.getUserID(sessionId);
+        if (userID == -1) {
+            throw new SessionExpiredException("Session Expired. Please Login Again");
+        }
+        return userID;
     }
 
     @PostMapping(path = "/register", produces = "application/json")
@@ -56,92 +61,50 @@ public class UserController {
     }
 
     @GetMapping(path = "/borrow-history", produces = "application/json")
-    public ResponseEntity<Map<String, List<BorrowDetails>>> getBooksBorrowedByEmail(@CookieValue(value = "JSESSION", defaultValue = "12345")String sessionID) {
+    public ResponseEntity<Map<String, List<BorrowDetails>>> getBooksBorrowedByEmail(@CookieValue(value = "JSESSION")String sessionID) {
 
         int userID = isSessionValid(sessionID);
-        if (userID == -1) {
-            Map<String, List<BorrowDetails>> response = new HashMap<>();
-            response.put("message : Invalid or expired session. Please log in again.", null);
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
 
         return userService.getBooksBorrowedByEmail(userID);
     }
 
     @PostMapping(path = "book/borrow")
-    public ResponseEntity<Map<String, String>> borrowBook(@CookieValue(value = "JSESSION", defaultValue = "12345")String sessionID , @RequestParam("title") String title, HttpSession session) {
+    public ResponseEntity<Map<String, String>> borrowBook(@CookieValue(value = "JSESSION")String sessionID , @RequestParam("title") String title, HttpSession session) {
         int userID = isSessionValid(sessionID);
-        if (userID == -1) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Invalid or expired session. Please log in again");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
 
         return userService.borrowBook(userID, title);
     }
 
     @PostMapping(path = "book/return")
-    public ResponseEntity<Map<String, String>> returnBook(@CookieValue(value = "JSESSION", defaultValue = "12345")String sessionID, @RequestParam("title") String title, HttpSession session) {
+    public ResponseEntity<Map<String, String>> returnBook(@CookieValue(value = "JSESSION")String sessionID, @RequestParam("title") String title, HttpSession session) {
         int userID = isSessionValid(sessionID);
-        if (userID == -1) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Invalid or expired session. Please log in again");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
 
         return userService.returnBook(userID, title);
     }
 
     @GetMapping(path = "book/list", produces = "application/json")
-    public ResponseEntity<Map<String, List<Book>>> getAllBooks(@CookieValue(value = "JSESSION", defaultValue = "12345")String sessionID) {
-        int userID = isSessionValid(sessionID);
-        if (userID == -1) {
-            Map<String, List<Book>> response = new HashMap<>();
-            response.put("message : Invalid or expired session. Please log in again", null);
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<Map<String, List<Book>>> getAllBooks(@CookieValue(value = "JSESSION")String sessionID) {
+        isSessionValid(sessionID);
+
         Map<String, List<Book>> response = new HashMap<>();
-        response.put("result", userService.getAllBooks());
+        response.put("books", userService.getAllBooks());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping(path = "book/category/{category}", produces = "application/json")
-    public ResponseEntity<Map<String, List<Book>>> getBookByCategory(@CookieValue(value = "JSESSION", defaultValue = "12345")String sessionID, @PathVariable("category") Category category, HttpSession session) {
-        int userID = isSessionValid(sessionID);
-        if (userID == -1) {
-            Map<String, List<Book>> response = new HashMap<>();
-            response.put("message : Invalid or expired session. Please log in again", null);
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
-        Map<String, List<Book>> response = new HashMap<>();
-        response.put("result", userService.getBookByCategory(category));
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    @GetMapping(path = "book/search", produces = "application/json")
+    public ResponseEntity<Map<String, List<Book>>> searchBooks(@CookieValue(value = "JSESSION")String sessionID
+            , @RequestParam(name = "author", defaultValue = "default_author", required = false)String author
+            , @RequestParam(name = "title",defaultValue = "default_title", required = false) String title
+            , @RequestParam(name = "category", required = false) Category category
+            , @RequestParam(name = "pagination", required = false, defaultValue = "20")int pagination) {
 
-    @GetMapping(path = "book/author/{author}", produces = "application/json")
-    public ResponseEntity<Map<String, List<Book>>> getBookByAuthor(@CookieValue(value = "JSESSION", defaultValue = "12345")String sessionID, @PathVariable("author") String author, HttpSession session) {
-        int userID = isSessionValid(sessionID);
-        if (userID == -1) {
-            Map<String, List<Book>> response = new HashMap<>();
-            response.put("message : Invalid or expired session. Please log in again", null);
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
-        Map<String, List<Book>> response = new HashMap<>();
-        response.put("result", userService.getBookByAuthor(author));
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+        isSessionValid(sessionID);
 
-    @GetMapping(path = "book/title/{title}", produces = "application/json")
-    public ResponseEntity<Map<String, List<Book>>> getBookByTitle(@CookieValue(value = "JSESSION", defaultValue = "12345")String sessionID, @PathVariable("title") String title, HttpSession session) {
-        int userID = isSessionValid(sessionID);
-        if (userID == -1) {
-            Map<String, List<Book>> response = new HashMap<>();
-            response.put("message : Invalid or expired session. Please log in again", null);
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
         Map<String, List<Book>> response = new HashMap<>();
-        response.put("result", userService.getBookByTitle(title));
+
+        response.put("books", userService.searchBooks(author,title,category,pagination));
         return new ResponseEntity<>(response, HttpStatus.OK);
+
     }
 
 }

@@ -62,16 +62,10 @@ public class UserService {
         User original = userRepository.findUserByEmail(user.getEmail());
 
         if (original == null) {
-
             throw new UserNotFoundException("Invalid Email");
         }
         if (authenticateService.checkPassword(user.getPassword(), original.getPassword())) {
-            int userID =original.getUserID();
-            if(!sessionRepository.checkUserExist(userID)){
-                sessionRepository.addSession(userID, session.getId());
-            } else {
-                sessionRepository.updateSession(userID, session.getId());
-            }
+            sessionRepository.addSession(original.getUserID(), session.getId());
 
             Map<String, String> response = new HashMap<>();
             response.put("message", "Login Successful");
@@ -186,17 +180,15 @@ public class UserService {
         return userRepository.getBooksBorrowedByEmail(userID);
     }
 
-    public List<Book> getBookByCategory(Category category) {
-        return bookRepository.getAllBooks().stream().filter(book -> book.getCategory() == category).collect(Collectors.toList());
+    public List<Book> searchBooks(String author, String title, Category category, int pagination) {
+        return bookRepository.getAllBooks().stream()
+                .filter(book -> book.getCategory().equals(category) ||
+                        book.getAuthor().toLowerCase().contains(author.toLowerCase()) ||
+                        book.getTitle().toLowerCase().contains(title.toLowerCase()))
+                .limit(pagination)
+                .collect(Collectors.toList());
     }
 
-    public List<Book> getBookByAuthor(String author) {
-        return bookRepository.getAllBooks().stream().filter(book -> book.getAuthor().equalsIgnoreCase(author)).collect(Collectors.toList());
-    }
-
-    public List<Book> getBookByTitle(String title) {
-        return bookRepository.getAllBooks().stream().filter(book -> book.getTitle().equalsIgnoreCase(title)).collect(Collectors.toList());
-    }
 
     public List<Book> getAllBooks() {
         return bookRepository.getAllBooks();
@@ -214,12 +206,7 @@ public class UserService {
 
         if (authenticateService.checkPassword(admin.getPassword(), original.getPassword())) {
 
-            int userID = userRepository.findAdminByEmail(admin.getEmail()).getAdminID();
-            if(!sessionRepository.checkUserExist(userID)){
-                sessionRepository.addSession(userID, session.getId());
-            } else {
-                sessionRepository.updateSession(userID, session.getId());
-            }
+            sessionRepository.addSession(original.getAdminID(), session.getId());
 
             Map<String, String> response = new HashMap<>();
             response.put("message", "Login Successful");

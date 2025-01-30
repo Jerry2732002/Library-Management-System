@@ -6,6 +6,7 @@ import com.example.Library_Management_System.dto.User;
 import com.example.Library_Management_System.dto.rowmapper.AdminRowMapper;
 import com.example.Library_Management_System.dto.rowmapper.BorrowDetailsRowMapper;
 import com.example.Library_Management_System.dto.rowmapper.UserRowMapper;
+import com.example.Library_Management_System.enums.Membership;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -112,5 +113,21 @@ public class UserRepository {
         }
     }
 
+    public boolean updateUserMembership(String email, Membership membership) {
+        String sql = "UPDATE Users SET Membership = ? WHERE Email = ?";
 
+        int rowsAffect = jdbcTemplate.update(sql, membership.name(), email);
+
+        return rowsAffect == 1;
+    }
+
+    public Admin findAdminByID(int userID) {
+        String sql = "SELECT * FROM Users WHERE UserID = ?";
+
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{userID}, new AdminRowMapper());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
 }
